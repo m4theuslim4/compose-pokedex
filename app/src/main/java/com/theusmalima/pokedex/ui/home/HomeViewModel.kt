@@ -6,14 +6,16 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.theusmalima.pokedex.data.model.PokemonInfo
 import com.theusmalima.pokedex.data.repository.PokemonRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class HomeViewModel : ViewModel() {
-
-    val repo = PokemonRepository()
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    private val pokemonRepository: PokemonRepository
+): ViewModel() {
 
     fun getPokemons(): Flow<PagingData<PokemonInfo>> {
-        return repo.getPokemons().cachedIn(viewModelScope)
+        return pokemonRepository.getPokemons().cachedIn(viewModelScope)
     }
 }
