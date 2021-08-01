@@ -1,6 +1,5 @@
 package com.theusmalima.pokedex.data.repository
 
-import android.util.Log
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -11,10 +10,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class PokemonRepository {
-
-    @Inject
-    lateinit var service: PokemonApiService
+class PokemonRepository @Inject constructor(
+    private val service: PokemonApiService
+) {
 
     fun getPokemons(): Flow<PagingData<PokemonInfo>> {
         return Pager(

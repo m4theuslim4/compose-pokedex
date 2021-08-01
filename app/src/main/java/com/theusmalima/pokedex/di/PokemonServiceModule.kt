@@ -4,6 +4,7 @@ import com.theusmalima.pokedex.data.service.PokemonApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -12,10 +13,9 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 import javax.inject.Singleton
 
 @Module
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 class PokemonServiceModule {
 
-    @Singleton
     @Provides
     fun providesOkhttpClient(): OkHttpClient {
         val logging = HttpLoggingInterceptor()
@@ -26,7 +26,6 @@ class PokemonServiceModule {
             .build()
     }
 
-    @Singleton
     @Provides
     fun providesPokemonService(okHttpClient: OkHttpClient): PokemonApiService {
         return Retrofit.Builder()
