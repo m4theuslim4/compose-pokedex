@@ -1,5 +1,6 @@
 package com.theusmalima.pokedex.ui.home
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -12,6 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    val handle: SavedStateHandle,
     private val pokemonRepository: PokemonRepository
 ): ViewModel() {
 

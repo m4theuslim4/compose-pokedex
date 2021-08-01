@@ -14,6 +14,8 @@ class PokemonRepository @Inject constructor(
     private val service: PokemonApiService
 ) {
 
+    val teste = "ddddd".substringAfter("offset=").substringBefore("&")
+
     fun getPokemons(): Flow<PagingData<PokemonInfo>> {
         return Pager(
             config = PagingConfig(pageSize = 20),
