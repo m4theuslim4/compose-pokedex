@@ -17,8 +17,8 @@ class PokemonDataSource(
 
         return try {
             val page = params.key ?: 1
-
-            val listPokemons = service.getPokemons()
+            val offset = if(params.key == null) 0 else (page - 1) * 20
+            val listPokemons = service.getPokemons(offset = offset.toString())
 
             val newList = mutableListOf<PokemonInfo>()
             listPokemons.pokemons.forEach { pokemon ->
@@ -30,7 +30,7 @@ class PokemonDataSource(
             LoadResult.Page(
                 data = newList,
                 prevKey = if (page == 1) null else page - 1,
-                nextKey = null
+                nextKey = if(listPokemons.next == null) null else page.plus(1)
             )
 
         } catch (ex: Throwable) {
