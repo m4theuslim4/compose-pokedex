@@ -2,16 +2,15 @@ package com.theusmalima.pokedex.ui.home
 
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
@@ -26,12 +25,16 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
@@ -41,33 +44,37 @@ import coil.ImageLoader
 import coil.compose.LocalImageLoader
 import coil.compose.rememberImagePainter
 import coil.decode.SvgDecoder
+import com.theusmalima.pokedex.R
 import com.theusmalima.pokedex.data.model.PokemonInfo
 import com.theusmalima.pokedex.ui.theme.PokedexTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
 
 @AndroidEntryPoint
-class HomeActivity : AppCompatActivity() {
+class HomeFragment : Fragment() {
 
     private val viewModel: HomeViewModel by viewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View = ComposeView(requireContext()).apply {
         setContent {
+            val navController = findNavController()
             PokedexTheme {
-                PokemonList(pokemons = viewModel.getPokemons())
+                PokemonList(pokemons = viewModel.getPokemons(), navController)
             }
         }
     }
 }
 
 @Composable
-fun PokemonList(pokemons: Flow<PagingData<PokemonInfo>>) {
+fun PokemonList(pokemons: Flow<PagingData<PokemonInfo>>,navController: NavController) {
     val lazyPokemons: LazyPagingItems<PokemonInfo> = pokemons.collectAsLazyPagingItems()
     LazyColumn {
         items(lazyPokemons) { pokemons ->
-            PokemonItem(pokemon = pokemons)
+            PokemonItem(pokemon = pokemons, navController)
         }
     }
 
@@ -90,14 +97,18 @@ fun PokemonList(pokemons: Flow<PagingData<PokemonInfo>>) {
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, androidx.compose.material.ExperimentalMaterialApi::class)
 @Composable
-fun PokemonItem(pokemon: PokemonInfo?) {
+fun PokemonItem(pokemon: PokemonInfo?, navController: NavController) {
 
     Card(
         elevation = 10.dp, modifier = Modifier
             .padding(all = 8.dp)
-            .height(80.dp)
+            .height(80.dp),
+        onClick = {
+            val bundle = bundleOf("pokeId" to pokemon?.id.toString())
+            navController.navigate(R.id.action_home_fragment_to_details_fragment,bundle)
+        }
     ) {
         val modifier = Modifier
             .padding(all = 4.dp)
@@ -117,7 +128,7 @@ fun PokemonItem(pokemon: PokemonInfo?) {
             Column {
                 val pokename = pokemon.name.replaceFirstChar { it.uppercaseChar() }
                 Text(
-                    text = "${pokemon.id} $pokename",
+                    text = "#${pokemon.id} $pokename",
                     style = MaterialTheme.typography.subtitle2,
                     fontSize = 16.sp
                 )
@@ -137,6 +148,7 @@ fun PokemonItem(pokemon: PokemonInfo?) {
                     .wrapContentSize(Alignment.CenterEnd)
             ) {
                 val imageLoader = ImageLoader.Builder(LocalContext.current)
+                    .crossfade(true)
                     .componentRegistry {
                         add(SvgDecoder(LocalContext.current))
                     }

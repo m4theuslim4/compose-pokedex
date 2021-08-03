@@ -8,7 +8,9 @@ import androidx.paging.cachedIn
 import com.theusmalima.pokedex.data.model.PokemonInfo
 import com.theusmalima.pokedex.data.repository.PokemonRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.isActive
 import javax.inject.Inject
 
 @HiltViewModel
