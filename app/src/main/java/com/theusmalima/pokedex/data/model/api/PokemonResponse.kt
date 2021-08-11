@@ -1,4 +1,4 @@
-package com.theusmalima.pokedex.data.model
+package com.theusmalima.pokedex.data.model.api
 
 import com.google.gson.annotations.SerializedName
 
