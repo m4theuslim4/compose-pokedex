@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -45,7 +44,7 @@ import coil.compose.LocalImageLoader
 import coil.compose.rememberImagePainter
 import coil.decode.SvgDecoder
 import com.theusmalima.pokedex.R
-import com.theusmalima.pokedex.data.model.PokemonInfo
+import com.theusmalima.pokedex.data.model.api.PokemonSimpleInfo
 import com.theusmalima.pokedex.ui.theme.PokedexTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
@@ -70,8 +69,8 @@ class HomeFragment : Fragment() {
 }
 
 @Composable
-fun PokemonList(pokemons: Flow<PagingData<PokemonInfo>>,navController: NavController) {
-    val lazyPokemons: LazyPagingItems<PokemonInfo> = pokemons.collectAsLazyPagingItems()
+fun PokemonList(pokemons: Flow<PagingData<PokemonSimpleInfo>>, navController: NavController) {
+    val lazyPokemons: LazyPagingItems<PokemonSimpleInfo> = pokemons.collectAsLazyPagingItems()
     LazyColumn {
         items(lazyPokemons) { pokemons ->
             PokemonItem(pokemon = pokemons, navController)
@@ -99,7 +98,7 @@ fun PokemonList(pokemons: Flow<PagingData<PokemonInfo>>,navController: NavContro
 
 @OptIn(ExperimentalAnimationApi::class, androidx.compose.material.ExperimentalMaterialApi::class)
 @Composable
-fun PokemonItem(pokemon: PokemonInfo?, navController: NavController) {
+fun PokemonItem(pokemon: PokemonSimpleInfo?, navController: NavController) {
 
     Card(
         elevation = 10.dp, modifier = Modifier
@@ -107,7 +106,7 @@ fun PokemonItem(pokemon: PokemonInfo?, navController: NavController) {
             .height(80.dp),
         onClick = {
             val bundle = bundleOf("pokeId" to pokemon?.id.toString())
-            navController.navigate(R.id.action_home_fragment_to_details_fragment,bundle)
+            navController.navigate(R.id.action_home_fragment_to_details_fragment, bundle)
         }
     ) {
         val modifier = Modifier
@@ -115,7 +114,7 @@ fun PokemonItem(pokemon: PokemonInfo?, navController: NavController) {
             .fillMaxWidth()
         Row(modifier = modifier) {
             Image(
-                painter = rememberImagePainter(pokemon!!.pokeSprites?.urlImage),
+                painter = rememberImagePainter(pokemon!!.sprites?.bitImage),
                 contentDescription = "Contact profile picture",
                 modifier = Modifier
                     .size(40.dp)
@@ -154,32 +153,32 @@ fun PokemonItem(pokemon: PokemonInfo?, navController: NavController) {
                     }
                     .build()
 
-                CompositionLocalProvider(LocalImageLoader provides imageLoader) {
-                    val painter =
-                        rememberImagePainter(pokemon.pokeSprites?.other?.vectorImage?.url)
-                    Image(
-                        painter = painter,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(130.dp)
-                            .alpha(.5f)
-                            .drawWithCache {
-                                val gradient = Brush.horizontalGradient(
-                                    colors = listOf(
-                                        Color.Transparent,
-                                        Color.LightGray,
-                                        Color.DarkGray
-                                    ),
-                                )
-                                onDrawWithContent {
-                                    drawContent()
-                                    drawRect(gradient, blendMode = BlendMode.Multiply)
-                                }
-                            },
-                        alignment = Alignment.CenterEnd,
-                        contentScale = ContentScale.Crop,
-                    )
-                }
+                    CompositionLocalProvider(LocalImageLoader provides imageLoader) {
+                        val painter =
+                            rememberImagePainter(pokemon.sprites?.other?.vectorImage?.url)
+                        Image(
+                            painter = painter,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .width(160.dp)
+                                .alpha(.5f)
+                                .drawWithCache {
+                                    val gradient = Brush.horizontalGradient(
+                                        colors = listOf(
+                                            Color.Transparent,
+                                            Color.LightGray,
+                                            Color.DarkGray
+                                        ),
+                                    )
+                                    onDrawWithContent {
+                                        drawContent()
+                                        drawRect(gradient, blendMode = BlendMode.Multiply)
+                                    }
+                                },
+                            alignment = Alignment.CenterEnd,
+                            contentScale = ContentScale.Crop,
+                        )
+                    }
             }
         }
     }
