@@ -1,10 +1,12 @@
 package com.theusmalima.pokedex.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.dp
 
 private val DarkColorPalette = darkColors(
     primary = Purple200,
@@ -42,3 +44,10 @@ fun PokedexTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composabl
         content = content
     )
 }
+
+val BottomSheetShape = RoundedCornerShape(
+    topStart = 40.dp,
+    topEnd = 40.dp,
+    bottomStart = 0.dp,
+    bottomEnd = 0.dp
+)
