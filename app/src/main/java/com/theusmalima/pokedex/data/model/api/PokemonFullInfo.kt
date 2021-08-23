@@ -14,8 +14,22 @@ data class PokemonFullInfo(
     @SerializedName("sprites")
     override val sprites: PokeSprites?,
     @SerializedName("stats")
-    val stats: List<StatItem>
+    val stats: List<StatItem>,
+    @SerializedName("types")
+    val types: List<Type>
 ): PokemonBaseInfo()
+
+data class Type(
+    @SerializedName("slot")
+    val slot: Long,
+    @SerializedName("type")
+    val typeName: TypeName
+)
+
+data class TypeName(
+    @SerializedName("name")
+    val name: String
+)
 
 data class StatItem(
     @SerializedName("base_stat")

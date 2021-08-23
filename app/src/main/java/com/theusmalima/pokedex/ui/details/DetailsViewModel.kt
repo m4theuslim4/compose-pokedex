@@ -43,20 +43,21 @@ fun PokemonFullInfo.toDomain(): PokemonFullInfoDomain {
     val mapStats = mutableMapOf<String, Float>()
     this.stats.forEach {
         when (it.stat.name) {
-            HP_KEY -> { mapStats[HP_KEY] = it.value.toFloat()/100 }
-            ATK_KEY -> { mapStats[ATK_KEY] = it.value.toFloat()/100 }
-            DEF_KEY -> { mapStats[DEF_KEY] = it.value.toFloat()/100 }
-            SATK_KEY -> { mapStats[SATK_KEY] = it.value.toFloat()/100 }
-            SDEF_KEY -> { mapStats[SDEF_KEY] = it.value.toFloat()/100 }
-            SPD_KEY -> { mapStats[SPD_KEY] = it.value.toFloat()/100 }
+            HP_KEY -> { mapStats[HP_KEY] = it.value.toFloat()/200 }
+            ATK_KEY -> { mapStats[ATK_KEY] = it.value.toFloat()/200 }
+            DEF_KEY -> { mapStats[DEF_KEY] = it.value.toFloat()/200 }
+            SATK_KEY -> { mapStats[SATK_KEY] = it.value.toFloat()/200 }
+            SDEF_KEY -> { mapStats[SDEF_KEY] = it.value.toFloat()/200 }
+            SPD_KEY -> { mapStats[SPD_KEY] = it.value.toFloat()/200 }
         }
     }
     return PokemonFullInfoDomain(
-        name = this.name,
+        name = this.name.replaceFirstChar { it.uppercaseChar() },
         id = this.id,
         weight = this.weight,
         height = this.height,
         sprites = this.sprites,
-        stats = mapStats
+        stats = mapStats,
+        types = this.types
     )
 }

@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,9 +37,11 @@ import coil.ImageLoader
 import coil.compose.LocalImageLoader
 import coil.compose.rememberImagePainter
 import coil.decode.SvgDecoder
+import com.theusmalima.pokedex.R
 import com.theusmalima.pokedex.data.model.domain.*
 import com.theusmalima.pokedex.ui.theme.BottomSheetShape
 import com.theusmalima.pokedex.ui.theme.PokedexTheme
+import com.theusmalima.pokedex.ui.theme.pokemonColors
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -71,11 +74,12 @@ fun PokemonDetail(
     viewModel: DetailsViewModel
 ) {
     val pokemonInfo = viewModel.pokeInfo.collectAsState(null)
+    val mainType = pokemonInfo.value?.getMainType()
     Box {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Red)
+                .background(pokemonColors[mainType?.typeName?.name] ?: Color.LightGray)
         ) {
             Box(
                 modifier = Modifier
@@ -83,7 +87,47 @@ fun PokemonDetail(
                     .fillMaxSize()
                     .weight(1f)
             ) {
-
+                Column(horizontalAlignment = Alignment.Start, modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)) {
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            modifier = Modifier.align(Alignment.Center),
+                            text = pokemonInfo.value?.name ?: "",
+                            color = Color.White,
+                            fontSize = 30.sp
+                        )
+                        Text(
+                            modifier = Modifier.align(Alignment.CenterEnd),
+                            text = "#"+pokemonInfo.value?.id.toString().padStart(4,'0'),
+                            color = Color.White,
+                            fontSize = 20.sp
+                        )
+                    }
+                    val imageLoader = ImageLoader.Builder(LocalContext.current)
+                        .crossfade(true)
+                        .componentRegistry {
+                            add(SvgDecoder(LocalContext.current))
+                        }
+                        .build()
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .wrapContentSize(Alignment.BottomCenter)
+                    ) {
+                        CompositionLocalProvider(LocalImageLoader provides imageLoader) {
+                            val painter =
+                                rememberImagePainter("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/$pokemonId.svg")
+                            Image(
+                                painter = painter,
+                                contentDescription = null,
+                                modifier = Modifier.size(200.dp),
+                                alignment = Alignment.Center,
+                                contentScale = ContentScale.Inside,
+                            )
+                        }
+                    }
+                }
             }
             Surface(
                 modifier = Modifier
@@ -99,48 +143,24 @@ fun PokemonDetail(
                     Spacer(modifier = Modifier.height(50.dp))
 
                     AnimateTeste(max = pokemonInfo.value?.stats?.get(HP_KEY) ?: 0f, "HP", pokemonInfo)
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     AnimateTeste(max = pokemonInfo.value?.stats?.get(ATK_KEY) ?: 0f, "ATK", pokemonInfo)
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     AnimateTeste(max = pokemonInfo.value?.stats?.get(DEF_KEY) ?: 0f, "DEF", pokemonInfo)
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     AnimateTeste(max = pokemonInfo.value?.stats?.get(SATK_KEY) ?: 0f, "SATK", pokemonInfo)
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     AnimateTeste(max = pokemonInfo.value?.stats?.get(SDEF_KEY) ?: 0f, "SDEF", pokemonInfo)
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     AnimateTeste(max = pokemonInfo.value?.stats?.get(SPD_KEY) ?: 0f, "SPD", pokemonInfo)
 
                 }
                 }
-            }
-        }
-        val imageLoader = ImageLoader.Builder(LocalContext.current)
-            .crossfade(true)
-            .componentRegistry {
-                add(SvgDecoder(LocalContext.current))
-            }
-            .build()
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 64.dp)
-                .wrapContentSize(Alignment.Center)
-        ) {
-            CompositionLocalProvider(LocalImageLoader provides imageLoader) {
-                val painter =
-                    rememberImagePainter("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/$pokemonId.svg")
-                Image(
-                    painter = painter,
-                    contentDescription = null,
-                    modifier = Modifier.size(200.dp),
-                    alignment = Alignment.Center,
-                    contentScale = ContentScale.Inside,
-                )
             }
         }
 

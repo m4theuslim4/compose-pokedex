@@ -2,6 +2,7 @@ package com.theusmalima.pokedex.data.model.domain
 
 import com.theusmalima.pokedex.data.model.api.PokeSprites
 import com.theusmalima.pokedex.data.model.api.PokemonBaseInfo
+import com.theusmalima.pokedex.data.model.api.Type
 
 const val HP_KEY = "hp"
 const val ATK_KEY = "attack"
@@ -16,5 +17,15 @@ data class PokemonFullInfoDomain(
     override val weight: Long,
     override val height: Long,
     override val sprites: PokeSprites?,
-    val stats: Map<String,Float>
-): PokemonBaseInfo()
+    val stats: Map<String,Float>,
+    val types: List<Type>
+): PokemonBaseInfo() {
+
+    fun getMainType(): Type? {
+        var type: Type? = null
+        types.forEach {
+            if(it.slot == 1L) type = it
+        }
+        return type
+    }
+}
