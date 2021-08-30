@@ -11,10 +11,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -75,25 +72,84 @@ fun PokemonList(pokemons: Flow<PagingData<PokemonSimpleInfo>>, navController: Na
         items(lazyPokemons) { pokemons ->
             PokemonItem(pokemon = pokemons, navController)
         }
-    }
 
-    lazyPokemons.apply {
-        when {
-            loadState.refresh is LoadState.Loading -> {
-                Log.d("teste", "refresh LoadState.Loading")
-                showLoading(isLoading = true)
-            }
-            loadState.refresh is LoadState.NotLoading -> {
-                showLoading(isLoading = false)
-            }
-            loadState.append is LoadState.Loading -> {
-                Log.d("teste", "append LoadState.Loading")
-            }
-            loadState.append is LoadState.NotLoading -> {
-                Log.d("teste", "append LoadState.NotLoading")
+        lazyPokemons.apply {
+            when {
+                loadState.refresh is LoadState.Loading -> {
+                    item { LoadingView(modifier = Modifier.fillParentMaxSize()) }
+                }
+                loadState.append is LoadState.Loading -> {
+                    Log.d("teste", "append LoadState.Loading")
+                    item { LoadingItem() }
+                }
+                loadState.refresh is LoadState.Error -> {
+                    val e = lazyPokemons.loadState.refresh as LoadState.Error
+                    item {
+                        ErrorItem(
+                            message = e.error.localizedMessage!!,
+                            modifier = Modifier.fillParentMaxSize(),
+                            onClickRetry = { retry() }
+                        )
+                    }
+                }
+                loadState.append is LoadState.Error -> {
+                    val e = lazyPokemons.loadState.append as LoadState.Error
+                    item {
+                        ErrorItem(
+                            message = e.error.localizedMessage!!,
+                            onClickRetry = { retry() }
+                        )
+                    }
+                }
             }
         }
     }
+}
+
+@Composable
+fun LoadingView(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+fun ErrorItem(
+    message: String,
+    modifier: Modifier = Modifier,
+    onClickRetry: () -> Unit
+) {
+    Row(
+        modifier = modifier.padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = message,
+            maxLines = 1,
+            modifier = Modifier.weight(1f),
+            style = MaterialTheme.typography.h6,
+            color = Color.Red
+        )
+        OutlinedButton(onClick = onClickRetry) {
+            Text(text = "Try again")
+        }
+    }
+}
+
+@Composable
+fun LoadingItem() {
+    CircularProgressIndicator(
+        modifier = Modifier.fillMaxWidth()
+            .padding(16.dp)
+            .wrapContentWidth(Alignment.CenterHorizontally)
+    )
 }
 
 @OptIn(ExperimentalAnimationApi::class, androidx.compose.material.ExperimentalMaterialApi::class)
